@@ -22,20 +22,14 @@ def get_instance_statistics(tester, instance_dataset) -> dict:
 
 
 def save_training_image(save_dir, training_dataset, index):
-    image_path = (
-        os.path.join(
-            save_dir,
-            "index_{}.jpg".format(
-                index,
-            ),
-        ),
-    )
+    image_path = os.path.join(save_dir, "index_{}.jpg".format(index))
+
     DatasetUtil(training_dataset).save_sample_image(index, image_path)
     return image_path
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--dataset_name", type=str)
+parser.add_argument("--dataset_name", type=str, required=True)
 args = parser.parse_args()
 
 dc = DatasetCollection.get_by_name(args.dataset_name)
@@ -61,22 +55,25 @@ get_logger().info("min contribution is %s", min_contribution)
 get_logger().info("positive contributions is %s", contribution[contribution >= 0].shape)
 get_logger().info("negative contributions is %s", contribution[contribution < 0].shape)
 
-image_dir = os.path.join("image", args.dataset_name)
-threshold = 0.9
-os.makedirs(image_dir, exist_ok=True)
-mask = contribution > (max_contribution * threshold)
+threshold = 0
+mask = contribution > 0
 image_info = dict()
 for idx in mask.nonzero().tolist():
     idx = idx[0]
+    image_dir = os.path.join("image", args.dataset_name, "positive")
+    os.makedirs(image_dir, exist_ok=True)
     training_dataset = dc.get_training_dataset()
     image_path = save_training_image(image_dir, training_dataset, idx)
     label = training_dataset[idx][1]
     image_info[str(idx)] = [image_path, dc.get_label_names()[label], contribution[idx]]
 
 
-mask = contribution < (min_contribution * threshold)
+mask = contribution < 0
 for idx in mask.nonzero().tolist():
     idx = idx[0]
+    training_dataset = dc.get_training_dataset()
+    image_dir = os.path.join("image", args.dataset_name, "negative")
+    os.makedirs(image_dir, exist_ok=True)
     training_dataset = dc.get_training_dataset()
     image_path = save_training_image(image_dir, training_dataset, idx)
     label = training_dataset[idx][1]
