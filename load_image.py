@@ -7,7 +7,7 @@ import torch
 from cyy_naive_lib.algorithm.mapping_op import (
     change_mapping_keys, get_mapping_values_by_key_order)
 from cyy_naive_lib.log import get_logger
-from cyy_naive_pytorch_lib.dataset import DatasetUtil, sub_dataset
+from cyy_naive_pytorch_lib.dataset import DatasetUtil
 from cyy_naive_pytorch_lib.dataset_collection import DatasetCollection
 from cyy_naive_pytorch_lib.ml_type import MachineLearningPhase
 
@@ -65,17 +65,19 @@ image_dir = os.path.join("image", args.dataset_name)
 threshold = 0.9
 os.makedirs(image_dir, exist_ok=True)
 mask = contribution > (max_contribution * threshold)
-image_info=dict()
+image_info = dict()
 for idx in mask.nonzero().tolist():
     idx = idx[0]
-    image_path=save_training_image(image_dir, dc.get_training_dataset(), idx)
-    image_info[str(idx)]=[image_path,]
+    training_dataset = dc.get_training_dataset()
+    image_path = save_training_image(image_dir, training_dataset, idx)
+    label = training_dataset[idx][1]
+    image_info[str(idx)] = [image_path, dc.get_label_names()[label], contribution[idx]]
 
 
 mask = contribution < (min_contribution * threshold)
 for idx in mask.nonzero().tolist():
     idx = idx[0]
-    save_training_image(image_dir, dc.get_training_dataset(), idx)
-    save_training_image(
-        analysis_result_dir, tester, contribution, training_dataset, idx
-    )
+    training_dataset = dc.get_training_dataset()
+    image_path = save_training_image(image_dir, training_dataset, idx)
+    label = training_dataset[idx][1]
+    image_info[str(idx)] = [image_path, dc.get_label_names()[label], contribution[idx]]
