@@ -66,9 +66,13 @@
           <!-- <div class="style-select"> -->
           <div>
             <h3>Choose a dataset</h3>
-            <div class="radio">
-              <input type="radio" value="MNIST" checked />
+            <div class="radio-inline">
+              <input type="radio" name="dataset" value="MNIST" checked />
               <label>MNIST</label>
+            </div>
+            <div class="radio-inline">
+              <input type="radio" name="dataset" value="CIFAR10" />
+              <label>CIFAR10</label>
             </div>
           </div>
           <!-- Galley wrapper that contains all items -->
@@ -78,6 +82,28 @@
             itemscope
             itemtype="http://schema.org/ImageGallery"
           >
+            <!-- Use figure for a more semantic html -->
+            <figure
+              itemprop="associatedMedia"
+              itemscope
+              itemtype="http://schema.org/ImageObject"
+            >
+              <!-- Link to the big image, not mandatory, but usefull when there is no JS -->
+              <a
+                href="https://unsplash.it/1200/900/?image=702"
+                data-caption="Sea side, south shore<br><em class='text-muted'>© Dominik Schröder</em>"
+                data-width="1200"
+                data-height="900"
+                itemprop="contentUrl"
+              >
+                <!-- Thumbnail -->
+                <img
+                  src="https://unsplash.it/400/300/?image=702"
+                  itemprop="thumbnail"
+                  alt="Image description"
+                />
+              </a>
+            </figure>
             <!-- Use figure for a more semantic html -->
             <figure
               itemprop="associatedMedia"
@@ -201,6 +227,10 @@
               };
             container.push(item);
           });
+
+        var $radios = $("input:radio[name=dataset]");
+        $radios.click(function (event) {});
+        $radios.filter("[value=MNIST]").prop("checked", true);
 
         // Define click event on gallery item
         $("a")
