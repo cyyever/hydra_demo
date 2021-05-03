@@ -37,7 +37,6 @@
       figure {
         display: inline-block;
         width: 33.333%;
-        float: left;
       }
       img {
         width: 100%;
@@ -63,9 +62,8 @@
             >
           </h1>
 
-          <!-- <div class="style-select"> -->
-          <div>
-            <h3>Choose a dataset</h3>
+          <div class="text-center">
+            <h2>Choose a dataset and click the image to slide through</h3>
             <div class="radio-inline">
               <input type="radio" name="dataset" value="MNIST" checked />
               <label>MNIST</label>
@@ -171,9 +169,8 @@
 
         var $radios = $("input:radio[name=dataset]");
         $radios.click(function (event) {
-          var $dataset_name = $radios.filter(":checked").prop("value");
-          console.log("dataset is" + $dataset_name);
-          $.getJSON("MNIST.result.json", function (data) {
+          var dataset_name = $radios.filter(":checked").prop("value");
+          $.getJSON(dataset_name + ".result.json", function (data) {
             container = [];
             var items = [];
             $.each(data, function (index, info_list) {
@@ -183,7 +180,9 @@
               var caption =
                 "The " +
                 index +
-                "th image of MNIST with label '" +
+                "th image of " +
+                dataset_name +
+                " with label '" +
                 label +
                 "', contribution " +
                 contribution;
