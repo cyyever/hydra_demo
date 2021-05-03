@@ -42,6 +42,7 @@ if not os.path.isfile(json_path):
 with open(json_path, "rt") as f:
     contribution_dict = json.load(f)
 contribution_dict = change_mapping_keys(contribution_dict, int, True)
+keys = list(sorted(contribution_dict.keys()))
 contribution = torch.Tensor(list(get_mapping_values_by_key_order(contribution_dict)))
 
 std, mean = torch.std_mean(contribution)
@@ -56,25 +57,33 @@ get_logger().info("positive contributions is %s", contribution[contribution >= 0
 get_logger().info("negative contributions is %s", contribution[contribution < 0].shape)
 
 threshold = 0
-mask = contribution > 0
+mask = contribution >= 0
 image_info = dict()
 for idx in mask.nonzero().tolist():
-    idx = idx[0]
+    idx = keys[idx[0]]
     image_dir = os.path.join("image", args.dataset_name, "positive")
     os.makedirs(image_dir, exist_ok=True)
     training_dataset = dc.get_training_dataset()
     image_path = save_training_image(image_dir, training_dataset, idx)
     label = training_dataset[idx][1]
-    image_info[str(idx)] = [image_path, dc.get_label_names()[label], contribution[idx]]
+    image_info[str(idx)] = [
+        image_path,
+        dc.get_label_names()[label],
+        contribution_dict[idx],
+    ]
 
 
 mask = contribution < 0
 for idx in mask.nonzero().tolist():
-    idx = idx[0]
+    idx = keys[idx[0]]
     training_dataset = dc.get_training_dataset()
     image_dir = os.path.join("image", args.dataset_name, "negative")
     os.makedirs(image_dir, exist_ok=True)
     training_dataset = dc.get_training_dataset()
     image_path = save_training_image(image_dir, training_dataset, idx)
     label = training_dataset[idx][1]
-    image_info[str(idx)] = [image_path, dc.get_label_names()[label], contribution[idx]]
+    image_info[str(idx)] = [
+        image_path,
+        dc.get_label_names()[label],
+        contribution_dict[idx],
+    ]

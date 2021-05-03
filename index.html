@@ -81,52 +81,7 @@
             class="gallery"
             itemscope
             itemtype="http://schema.org/ImageGallery"
-          >
-            <!-- Use figure for a more semantic html -->
-            <figure
-              itemprop="associatedMedia"
-              itemscope
-              itemtype="http://schema.org/ImageObject"
-            >
-              <!-- Link to the big image, not mandatory, but usefull when there is no JS -->
-              <a
-                href="https://unsplash.it/1200/900/?image=702"
-                data-caption="Sea side, south shore<br><em class='text-muted'>© Dominik Schröder</em>"
-                data-width="1200"
-                data-height="900"
-                itemprop="contentUrl"
-              >
-                <!-- Thumbnail -->
-                <img
-                  src="https://unsplash.it/400/300/?image=702"
-                  itemprop="thumbnail"
-                  alt="Image description"
-                />
-              </a>
-            </figure>
-            <!-- Use figure for a more semantic html -->
-            <figure
-              itemprop="associatedMedia"
-              itemscope
-              itemtype="http://schema.org/ImageObject"
-            >
-              <!-- Link to the big image, not mandatory, but usefull when there is no JS -->
-              <a
-                href="https://unsplash.it/1200/900/?image=702"
-                data-caption="Sea side, south shore<br><em class='text-muted'>© Dominik Schröder</em>"
-                data-width="1200"
-                data-height="900"
-                itemprop="contentUrl"
-              >
-                <!-- Thumbnail -->
-                <img
-                  src="https://unsplash.it/400/300/?image=702"
-                  itemprop="thumbnail"
-                  alt="Image description"
-                />
-              </a>
-            </figure>
-          </div>
+          ></div>
         </div>
       </div>
     </div>
@@ -201,7 +156,7 @@
     </div>
 
     <!-- Import jQuery and PhotoSwipe Scripts -->
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.0/photoswipe.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.0/photoswipe-ui-default.min.js"></script>
 
@@ -214,48 +169,85 @@
         // Init empty gallery array
         var container = [];
 
-        // Loop over gallery items and push it to the array
-        $("#gallery")
-          .find("figure")
-          .each(function () {
-            var $link = $(this).find("a"),
-              item = {
-                src: $link.attr("href"),
-                w: $link.data("width"),
-                h: $link.data("height"),
-                title: $link.data("caption"),
-              };
-            container.push(item);
-          });
-
         var $radios = $("input:radio[name=dataset]");
-        $radios.click(function (event) {});
-        $radios.filter("[value=MNIST]").prop("checked", true);
+        $radios.click(function (event) {
+          var $dataset_name = $radios.filter(":checked").prop("value");
+          console.log("dataset is" + $dataset_name);
+          $.getJSON(
+            "contribution/MNIST/approx_hydra_contribution.json",
+            function (data) {
+              console.log("gfdgfd");
+              container = [];
+              var items = [];
+              $.each(data, function (index, contribution) {
+                if (contribution >= 0) {
+                  image_path = "image/MNIST/positive/index_" + index + ".jpg";
+                } else {
+                  image_path = "image/MNIST/negative/index_" + index + ".jpg";
+                }
+                caption =
+                  "The " +
+                  index +
+                  "th image of MNIST, with label 2 and contribution +" +
+                  contribution;
+                container.push({
+                  src: image_path,
+                  w: 1200,
+                  h: 900,
+                  title: caption,
+                });
+                items.push(`
+            <figure
+              itemprop='associatedMedia'
+              itemscope
+              itemtype='http://schema.org/ImageObject'
+            >
+              <a
+                href='${image_path}'
+                itemprop='contentUrl'
+              >
+                <img
+                  src='${image_path}'
+                  itemprop='thumbnail'
+                  alt='${caption}'
+                />
+              </a>
+            </figure> 
+                  `);
+              });
 
-        // Define click event on gallery item
-        $("a")
-          .not("#hydra_url")
-          .click(function (event) {
-            // Prevent location change
-            event.preventDefault();
+              $("#gallery").html(items.join(""));
 
-            // Define object and gallery options
-            var $pswp = $(".pswp")[0],
-              options = {
-                index: $(this).parent("figure").index(),
-                bgOpacity: 0.85,
-                showHideOpacity: true,
-              };
+              // Define click event on gallery item
+              $("#gallery > a")
+                .off("click")
+                .click(function (event) {
+                  // Prevent location change
+                  event.preventDefault();
 
-            // Initialize PhotoSwipe
-            var gallery = new PhotoSwipe(
-              $pswp,
-              PhotoSwipeUI_Default,
-              container,
-              options
-            );
-            gallery.init();
+                  // Define object and gallery options
+                  var $pswp = $(".pswp")[0],
+                    options = {
+                      index: $(this).parent("figure").index(),
+                      bgOpacity: 0.85,
+                      showHideOpacity: true,
+                    };
+
+                  // Initialize PhotoSwipe
+                  var gallery = new PhotoSwipe(
+                    $pswp,
+                    PhotoSwipeUI_Default,
+                    container,
+                    options
+                  );
+                  gallery.init();
+                });
+            }
+          ).fail(function () {
+            alert("error");
           });
+        });
+        $radios.filter("[value=MNIST]").click();
       })(jQuery);
     </script>
   </body>
