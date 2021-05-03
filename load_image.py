@@ -87,3 +87,5 @@ for idx in mask.nonzero().tolist():
         dc.get_label_names()[label],
         contribution_dict[idx],
     ]
+with open(args.dataset_name + ".result.json", "wt") as f:
+    json.dump(image_info, f)

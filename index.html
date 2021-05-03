@@ -176,19 +176,20 @@
           $.getJSON(
             "contribution/MNIST/approx_hydra_contribution.json",
             function (data) {
-              console.log("gfdgfd");
               container = [];
               var items = [];
               $.each(data, function (index, contribution) {
                 if (contribution >= 0) {
-                  image_path = "image/MNIST/positive/index_" + index + ".jpg";
+                  var image_path =
+                    "image/MNIST/positive/index_" + index + ".jpg";
                 } else {
-                  image_path = "image/MNIST/negative/index_" + index + ".jpg";
+                  var image_path =
+                    "image/MNIST/negative/index_" + index + ".jpg";
                 }
-                caption =
+                var caption =
                   "The " +
                   index +
-                  "th image of MNIST, with label 2 and contribution +" +
+                  "th image of MNIST with label 2 and contribution " +
                   contribution;
                 container.push({
                   src: image_path,
@@ -196,7 +197,8 @@
                   h: 900,
                   title: caption,
                 });
-                items.push(`
+                if (items.length == 0) {
+                  items.push(`
             <figure
               itemprop='associatedMedia'
               itemscope
@@ -212,14 +214,15 @@
                   alt='${caption}'
                 />
               </a>
-            </figure> 
+            </figure>
                   `);
+                }
               });
 
               $("#gallery").html(items.join(""));
 
               // Define click event on gallery item
-              $("#gallery > a")
+              $("#gallery a")
                 .off("click")
                 .click(function (event) {
                   // Prevent location change
@@ -243,9 +246,7 @@
                   gallery.init();
                 });
             }
-          ).fail(function () {
-            alert("error");
-          });
+          );
         });
         $radios.filter("[value=MNIST]").click();
       })(jQuery);
