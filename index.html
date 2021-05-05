@@ -184,12 +184,12 @@
                 dataset_name +
                 " with label '" +
                 label +
-                "', contribution " +
+                "',<br> and "+(contribution<0?"negative":"positive")+" contribution " +
                 contribution;
               container.push({
                 src: image_path,
-                w: 1200,
-                h: 900,
+                w:0,
+                h:0,
                 title: caption,
               });
               if (items.length == 0) {
@@ -238,6 +238,20 @@
                   container,
                   options
                 );
+
+                gallery.listen('gettingData', function(index, item) {
+                  if (item.w < 1 || item.h < 1) { // unknown size
+                  var img = new Image();
+                  img.onload = function() { // will get size after load
+                  var  max_edge=Math.max(this.width,this.height)
+                  item.w = Math.floor(400/max_edge*this.width);
+                  item.h = Math.floor(400/max_edge*this.height);
+                  gallery.invalidateCurrItems(); // reinit Items
+                  gallery.updateSize(true); // reinit Items
+                  }
+                  img.src = item.src; // let's download image
+                  }
+                  });
                 gallery.init();
               });
           });

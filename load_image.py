@@ -57,7 +57,7 @@ get_logger().info("positive contributions is %s", contribution[contribution >= 0
 get_logger().info("negative contributions is %s", contribution[contribution < 0].shape)
 
 image_info = dict()
-mask = contribution >= max_contribution * 0.8
+mask = contribution >= max_contribution * 0.9
 for idx in mask.nonzero().tolist():
     idx = keys[idx[0]]
     image_dir = os.path.join("image", args.dataset_name, "positive")
@@ -72,7 +72,7 @@ for idx in mask.nonzero().tolist():
     ]
 
 
-mask = contribution < min_contribution * 0.5
+mask = contribution < min_contribution * 0.9
 for idx in mask.nonzero().tolist():
     idx = keys[idx[0]]
     training_dataset = dc.get_training_dataset()
