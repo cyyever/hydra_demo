@@ -2,6 +2,7 @@ import argparse
 import copy
 import json
 import os
+import cyy_torch_vision  # noqa: F401
 
 import torch
 from cyy_naive_lib.algorithm.mapping_op import (
@@ -10,9 +11,9 @@ from cyy_naive_lib.algorithm.mapping_op import (
 )
 from cyy_naive_lib.log import log_info
 from cyy_torch_toolbox import (
-    MachineLearningPhase,
-    DatasetCollection,
     ClassificationDatasetCollection,
+    DatasetCollection,
+    MachineLearningPhase,
 )
 from cyy_torch_toolbox.dataset import DatasetCollectionConfig
 from cyy_torch_vision import VisionDatasetUtil
@@ -54,7 +55,7 @@ if __name__ == "__main__":
     if not os.path.isfile(json_path):
         raise RuntimeError("unknown dataset:" + args.dataset_name)
 
-    with open(json_path, "rt", encoding="utf8") as f:
+    with open(json_path, encoding="utf8") as f:
         contribution_dict = json.load(f)
     contribution_dict = change_mapping_keys(contribution_dict, int, True)
     keys = list(sorted(contribution_dict.keys()))
@@ -95,5 +96,5 @@ if __name__ == "__main__":
             label_name,
             contribution_dict[idx],
         ]
-    with open(args.dataset_name + ".result.json", "wt", encoding="utf8") as f:
+    with open(args.dataset_name + ".result.json", "w", encoding="utf8") as f:
         json.dump(image_info, f)
