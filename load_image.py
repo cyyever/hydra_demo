@@ -2,8 +2,8 @@ import argparse
 import copy
 import json
 import os
-import cyy_torch_vision  # noqa: F401
 
+import cyy_torch_vision  # noqa: F401
 import torch
 from cyy_naive_lib.algorithm.mapping_op import (
     change_mapping_keys,
